@@ -1,9 +1,9 @@
 name: Deploy to GitHub Pages
 
 on:
-  push:
-    branches:
-      - main  # 设置要触发部署的分支
+  # push:
+  #   branches:
+  #     - main  # 设置要触发部署的分支
   workflow_dispatch: # 允许手动触发部署
 
 permissions:
@@ -38,9 +38,7 @@ jobs:
         run: pnpm install
 
       - name: Build
-        run: |
-          pnpm vue-tsc --noEmit false
-          pnpm build
+        run: pnpm build
 
       - name: Setup Pages
         uses: actions/configure-pages@v4

@@ -65,6 +65,10 @@ npm run build
 
 ## 运行效果
 
+
+[在线预览](https://www.ztianzeng.com/alist-course-plugin/)
+
+
 ![截图](docs/config.png)
 
 ![截图](docs/list.png)
