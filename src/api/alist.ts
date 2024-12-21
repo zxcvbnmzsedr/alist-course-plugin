@@ -9,8 +9,8 @@ const alistApi = axios.create({
 alistApi.interceptors.request.use(
   config => {
     // 在发送请求之前做些什么
-    config.baseURL = localStorage.getItem('alistServerUrl')
-    config.headers.Authorization = localStorage.getItem('alistToken')
+    config.baseURL = localStorage.getItem('alistServerUrl') || ''
+    config.headers.Authorization = localStorage.getItem('alistToken') || ''
     return config
   },
   error => {
@@ -45,7 +45,7 @@ export const getFileList = async (path = '/') => {
 }
 
 // 获取文件信息
-export const getFileInfo = async (path) => {
+export const getFileInfo = async (path: string) => {
   try {
     const response = await alistApi.post('/api/fs/get', {
       path,
@@ -59,7 +59,7 @@ export const getFileInfo = async (path) => {
 }
 
 // 获取下载链接
-export const getDownloadUrl = async (path) => {
+export const getDownloadUrl = async (path: string) => {
   try {
     const response = await alistApi.post('/api/fs/link', {
       path,
@@ -72,7 +72,7 @@ export const getDownloadUrl = async (path) => {
   }
 }
 // axios.post(`${config.value.serverUrl}/api/auth/login`
-export const login = async (username, password) => {
+export const login = async (username: string, password: string) => {
   const response = await alistApi.post(`/api/auth/login`, {
     username,
     password
@@ -80,7 +80,7 @@ export const login = async (username, password) => {
   return response.data
 }
 
-export const putFile = async (path, file) => {
+export const putFile = async (path: string, file: any) => {
   const response = await alistApi.put(`/api/fs/form`, file, {
     headers: {
       'File-Path': encodeURIComponent(path)
