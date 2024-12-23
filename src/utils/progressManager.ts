@@ -55,6 +55,7 @@ export class ProgressManager {
     if (this.syncTimer) {
       clearInterval(this.syncTimer)
       this.syncTimer = null
+      this.progressStore.saveProgress()
     }
   }
 

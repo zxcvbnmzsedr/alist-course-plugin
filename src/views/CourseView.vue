@@ -3,13 +3,17 @@
     <div class="bg-white border-b border-gray-200 p-4 flex-between">
       <div class="flex items-center">
         <el-button @click="router.push('/')" class="mr-4">
-          <el-icon><ArrowLeft /></el-icon>
+          <el-icon>
+            <ArrowLeft/>
+          </el-icon>
           <span class="ml-1">返回课程列表</span>
         </el-button>
         <h2 class="text-xl font-semibold">{{ $route.params.courseName }}</h2>
       </div>
       <el-button type="primary" @click="router.push('/config')">
-        <el-icon><Setting /></el-icon>
+        <el-icon>
+          <Setting/>
+        </el-icon>
         <span class="ml-1">配置</span>
       </el-button>
     </div>
@@ -18,7 +22,7 @@
       <div class="w-600px p-5 border-r border-gray-200 overflow-y-auto">
         <div class="mb-4 text-gray-500">当前目录：{{ coursePath }}/{{ $route.params.courseName }}</div>
         <div v-if="loading" class="flex-center py-20">
-          <el-spinner />
+          <el-spinner/>
         </div>
         <el-tree
           v-else
@@ -32,9 +36,15 @@
         >
           <template #default="{ node, data }">
             <div class="custom-tree-node">
-              <el-icon v-if="data.is_dir" class="mr-1"><Folder /></el-icon>
-              <el-icon v-else-if="isVideo(data)" class="mr-1"><VideoPlay /></el-icon>
-              <el-icon v-else class="mr-1"><Document /></el-icon>
+              <el-icon v-if="data.is_dir" class="mr-1">
+                <Folder/>
+              </el-icon>
+              <el-icon v-else-if="isVideo(data)" class="mr-1">
+                <VideoPlay/>
+              </el-icon>
+              <el-icon v-else class="mr-1">
+                <Document/>
+              </el-icon>
               <span :class="{ 'text-primary': isVideo(data) }">{{ node.label }}</span>
               <div v-if="isVideo(data) && progressStore.getVideoProgress(data.path)" class="ml-2">
                 <el-progress
@@ -59,7 +69,7 @@
           />
         </div>
         <div v-else class="flex-center h-full">
-          <el-empty description="请选择视频文件进行播放" />
+          <el-empty description="请选择视频文件进行播放"/>
         </div>
       </div>
     </div>
@@ -67,16 +77,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import {ref, onMounted} from 'vue'
+import {useRouter, useRoute} from 'vue-router'
 import VideoPlayer from '@/components/VideoPlayer.vue'
-import { ElMessage } from 'element-plus'
-import { ArrowLeft, Setting, Folder, Document, VideoPlay } from '@element-plus/icons-vue'
-import { orderBy } from 'natural-orderby'
-import type { AlistFile } from '@/types/alist'
-import type { VideoProgress } from '@/types/progress'
-import { getFileList, getFileInfo } from '@/api/alist'
-import { useProgressStore } from '@/stores/progressStore'
+import {ElMessage} from 'element-plus'
+import {ArrowLeft, Setting, Folder, Document, VideoPlay} from '@element-plus/icons-vue'
+import {orderBy} from 'natural-orderby'
+import type {AlistFile} from '@/types/alist'
+import {getFileList, getFileInfo, getOtherVideoPreview} from '@/api/alist'
+import {useProgressStore} from '@/stores/progressStore'
+import type {quality} from "artplayer/types/quality";
+
 interface ApiError {
   response?: {
     status: number;
@@ -175,10 +186,30 @@ const handleNodeClick = async (data: AlistFile) => {
   if (!data.is_dir) {
     try {
       const response = await getFileInfo(data.path)
-
+      const otherPreview = await getOtherVideoPreview(data.path)
+      const quantity: quality[] = []
+      let download_url = response.data.raw_url;
+      if (otherPreview) {
+        const live_transcoding = otherPreview.data?.video_preview_play_info?.live_transcoding_task_list?.map(it => {
+          return {
+            html: it.template_id,
+            url: it.url
+          }
+        }) || []
+        const lastLive = live_transcoding[live_transcoding.length - 1]
+        lastLive.default = true
+        // 浏览器有可能无法解码，所以优先使用在线进行解码
+        download_url = lastLive.url
+        quantity.push(live_transcoding)
+      }
+      quantity.push({
+        html: '原画',
+        url: response.data.raw_url
+      })
       selectedFile.value = {
         ...data,
-        download_url: response.data.raw_url
+        download_url: download_url,
+        quantity: quantity
       }
     } catch (error) {
       ElMessage.error('获取文件信息失败')

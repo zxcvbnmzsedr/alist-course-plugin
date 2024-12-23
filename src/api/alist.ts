@@ -58,6 +58,20 @@ export const getFileInfo = async (path: string) => {
   }
 }
 
+export const getOtherVideoPreview = async (path: string) => {
+  try {
+    const response = await alistApi.post('/api/fs/other', {
+      path,
+      method: 'video_preview',
+      password: ''
+    })
+    return response.data
+  } catch (error) {
+    console.error('获取文件信息失败:', error)
+    throw error
+  }
+}
+
 // 获取下载链接
 export const getDownloadUrl = async (path: string) => {
   try {

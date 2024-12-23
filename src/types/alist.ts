@@ -1,3 +1,5 @@
+import type {quality} from "artplayer/types/quality";
+
 export interface AlistFile {
   name: string
   path: string
@@ -7,7 +9,8 @@ export interface AlistFile {
   sign?: string
   thumb?: string
   type: number
-  download_url?: string
+  download_url: string
+  quantity?: quality,
   children?: AlistFile[]
 }
 

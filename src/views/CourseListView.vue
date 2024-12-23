@@ -48,7 +48,6 @@ import { ElMessage } from 'element-plus'
 import { Setting, Folder } from '@element-plus/icons-vue'
 import type { AlistFile } from '@/types/alist'
 import { getFileList } from '@/api/alist'
-import { useProgressStore } from '@/stores/progressStore'
 const router = useRouter()
 const courses = ref<AlistFile[]>([])
 const loading = ref(true)
