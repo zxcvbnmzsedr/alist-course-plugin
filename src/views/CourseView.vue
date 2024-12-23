@@ -1,25 +1,29 @@
 <template>
-  <div class="h-screen flex flex-col w-screen">
-    <div class="bg-white border-b border-gray-200 p-4 flex-between">
-      <div class="flex items-center">
-        <el-button @click="router.push('/')" class="mr-4">
-          <el-icon>
-            <ArrowLeft/>
-          </el-icon>
-          <span class="ml-1">返回课程列表</span>
+  <div class="h-screen flex flex-col w-screen bg-white">
+    <el-page-header class="border-b p-4" @back="router.push('/')" title="返回课程列表">
+      <template #content>
+        {{ $route.params.courseName }}
+      </template>
+      <template #extra>
+        <el-button @click="drawerVisible = true" class="mr-2">
+          <el-icon><Menu /></el-icon>
+          <span class="ml-1">目录</span>
         </el-button>
-        <h2 class="text-xl font-semibold">{{ $route.params.courseName }}</h2>
-      </div>
-      <el-button type="primary" @click="router.push('/config')">
-        <el-icon>
-          <Setting/>
-        </el-icon>
-        <span class="ml-1">配置</span>
-      </el-button>
-    </div>
+        <el-button type="primary" @click="router.push('/config')">
+          <el-icon>
+            <Setting/>
+          </el-icon>
+          <span class="ml-1">配置</span>
+        </el-button>
+      </template>
+    </el-page-header>
 
     <div class="flex-1 flex overflow-hidden h-full w-full overflow-y-auto">
-      <div class="w-600px p-5 border-r border-gray-200 overflow-y-auto">
+      <el-drawer
+        v-model="drawerVisible"
+        title="课程目录"
+        :size="600"
+      >
         <div class="mb-4 text-gray-500">当前目录：{{ coursePath }}/{{ $route.params.courseName }}</div>
         <div v-if="loading" class="flex-center py-20">
           <el-spinner/>
@@ -59,7 +63,7 @@
             </div>
           </template>
         </el-tree>
-      </div>
+      </el-drawer>
       <div class="flex-1 p-5 flex-center">
         <div v-if="selectedFile && isVideo(selectedFile)" class="w-full h-full">
           <video-player
@@ -81,7 +85,7 @@ import {ref, onMounted} from 'vue'
 import {useRouter, useRoute} from 'vue-router'
 import VideoPlayer from '@/components/VideoPlayer.vue'
 import {ElMessage} from 'element-plus'
-import {ArrowLeft, Setting, Folder, Document, VideoPlay} from '@element-plus/icons-vue'
+import {ArrowLeft, Setting, Folder, Document, VideoPlay, Menu} from '@element-plus/icons-vue'
 import {orderBy} from 'natural-orderby'
 import type {AlistFile} from '@/types/alist'
 import {getFileList, getFileInfo, getOtherVideoPreview} from '@/api/alist'
@@ -256,6 +260,9 @@ const initProgressStore = async () => {
   const rootPath = `/${coursePath.value}/${route.params.courseName}`
   await progressStore.changeCourse(rootPath)
 }
+
+// Add drawer control
+const drawerVisible = ref(true)
 
 onMounted(async () => {
   await initProgressStore()
