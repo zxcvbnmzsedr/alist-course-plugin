@@ -34,6 +34,9 @@ const createPlayer = async (file: AlistFile) => {
   if (player) {
     player.destroy();
     player = null;
+    if (progressManager) {
+      progressManager.stopAutoSync();
+    }
   }
 
   try {
