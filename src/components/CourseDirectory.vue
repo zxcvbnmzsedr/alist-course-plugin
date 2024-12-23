@@ -48,10 +48,9 @@ import {ElMessage} from 'element-plus'
 import {Folder, Document, VideoPlay} from '@element-plus/icons-vue'
 import {orderBy} from 'natural-orderby'
 import type {AlistFile} from '@/types/alist'
-import {getFileList, getFileInfo, getOtherVideoPreview} from '@/api/alist'
+import {getFileList} from '@/api/alist'
 import {useProgressStore} from '@/stores/progressStore'
 import {isVideo} from '@/utils/filetype'
-import type {quality} from "artplayer/types/quality";
 
 interface Props {
   coursePath: string
@@ -61,6 +60,7 @@ interface Props {
 const props = defineProps<Props>()
 const emit = defineEmits<{
   (e: 'fileSelected', file: AlistFile): void
+  (e: 'updateVideoFiles', files: AlistFile[]): void
 }>()
 
 const router = useRouter()
@@ -134,6 +134,7 @@ const loadNode = async (node: TreeNode, resolve: (data: AlistFile[]) => void) =>
       (item: AlistFile) => item.name
     ])
     progressStore.initDirChildProcess(sortedFiles)
+    emit('updateVideoFiles', sortedFiles)
     resolve(sortedFiles)
   } catch (error: unknown) {
     if ((error as ApiError).response?.status === 401) {
@@ -149,46 +150,13 @@ const loadNode = async (node: TreeNode, resolve: (data: AlistFile[]) => void) =>
 
 // 处理节点点击
 const handleNodeClick = async (data: AlistFile) => {
+  console.log('handleNodeClick', { data })
   if (!data.is_dir) {
-    try {
-      const response = await getFileInfo(data.path)
-      const otherPreview = await getOtherVideoPreview(data.path)
-      const quantity: Array<quality> = []
-      let download_url = response.data.raw_url;
-      if (otherPreview) {
-        interface TranscodingTask {
-          template_id: string;
-          url: string;
-        }
-        const live_transcoding = otherPreview.data?.video_preview_play_info?.live_transcoding_task_list?.map((it: TranscodingTask) => ({
-          html: it.template_id,
-          url: it.url
-        })) || []
-        const lastLive = live_transcoding[live_transcoding.length - 1]
-        if (lastLive) {
-          lastLive.default = true
-          // 浏览器有可能无法解码，所以优先使用在线进行解码
-          download_url = lastLive.url
-          quantity.push(...live_transcoding)
-        }
-      }
-      quantity.push({
-        html: '原画',
-        url: response.data.raw_url
-      })
-      emit('fileSelected', {
-        ...data,
-        download_url: download_url,
-        quantity: quantity
-      })
-    } catch (error: unknown) {
-      ElMessage.error('获取文件信息失败')
-      console.error('Error getting file info:', error)
-    }
+    emit('fileSelected', data)
   }
 }
 
-// 获取视频进度百分比
+// ���取视频进度百分比
 const progressStore = useProgressStore()
 const getVideoPercentage = (path: string): number => {
   const progress = progressStore.getVideoProgress(path)
@@ -223,13 +191,15 @@ const initRootNode = async () => {
     const rootPath = `/${props.coursePath}/${props.courseName}`
     const response = await getFileList(rootPath)
 
-    treeData.value = response.data.content.map((file: AlistFile) => ({
+    const files = response.data.content.map((file: AlistFile) => ({
       ...file,
       path: `${rootPath}/${file.name}`
     }))
+    treeData.value = files
+    emit('updateVideoFiles', files)
   } catch (error: unknown) {
     if ((error as ApiError).response?.status === 401) {
-      ElMessage.error('认证失败，请重新登录')
+      ElMessage.error('认证失败��请重新登录')
       router.push('/config')
     } else {
       ElMessage.error('获取文件列表失败')

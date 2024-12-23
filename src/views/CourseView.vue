@@ -28,12 +28,16 @@
           :course-path="coursePath"
           :course-name="courseName"
           @file-selected="selectedFile = $event"
+          @update-video-files="updateVideoFiles"
         />
       </el-drawer>
       <div class="flex-1 p-5 flex-center">
         <div v-if="selectedFile && isVideo(selectedFile)" class="w-full h-full">
           <video-player
-            :course-file="selectedFile"
+            v-model:course-file="selectedFile"
+            :previous-video="getPreviousVideo(selectedFile)"
+            :next-video="getNextVideo(selectedFile)"
+            @update:courseFile="updateCourseFile"
             class="vjs-custom-skin"
             ref="videoPlayer"
           />
@@ -53,24 +57,52 @@ import VideoPlayer from '@/components/VideoPlayer.vue'
 import CourseDirectory from '@/components/CourseDirectory.vue'
 import {Setting, Menu} from '@element-plus/icons-vue'
 import type {AlistFile} from '@/types/alist'
+import {isVideo} from '@/utils/filetype'
 
 const router = useRouter()
 const route = useRoute()
 const selectedFile = ref<AlistFile | null>(null)
 const coursePath = ref<string>(localStorage.getItem('alistCoursePath') || '')
 const drawerVisible = ref(true)
+const videoFiles = ref<AlistFile[]>([])
+
+// 获取上一个视频文件
+const getPreviousVideo = (currentFile: AlistFile): AlistFile | null => {
+  console.log('getPreviousVideo called', { currentFile, videoFiles: videoFiles.value })
+  const currentIndex = videoFiles.value.findIndex(file => file.name === currentFile.name)
+  console.log('currentIndex', currentIndex)
+  if (currentIndex > 0) {
+    return videoFiles.value[currentIndex - 1]
+  }
+  return null
+}
+
+const updateCourseFile = (file: AlistFile) => {
+  selectedFile.value = file
+}
+
+// 获取下一个视频文件
+const getNextVideo = (currentFile: AlistFile): AlistFile | null => {
+  console.log('getNextVideo called', { currentFile, videoFiles: videoFiles.value })
+  const currentIndex = videoFiles.value.findIndex(file => file.name === currentFile.name)
+  console.log('currentIndex', currentIndex)
+  if (currentIndex < videoFiles.value.length - 1) {
+    return videoFiles.value[currentIndex + 1]
+  }
+  return null
+}
+
+// 更新视频文件列表
+const updateVideoFiles = (files: AlistFile[]) => {
+  console.log('updateVideoFiles called', { files })
+  videoFiles.value = files.filter(file => isVideo(file))
+  console.log('filtered videoFiles', videoFiles.value)
+}
 
 const courseName = computed(() => {
   const name = route.params.courseName
   return typeof name === 'string' ? name : name[0] || ''
 })
-
-// 检查是否是视频文件
-const isVideo = (file: AlistFile): boolean => {
-  if (!file || !file.name) return false
-  const videoExtensions = ['.mp4', '.webm', '.ogg', '.m3u8']
-  return videoExtensions.some(ext => file.name.toLowerCase().endsWith(ext))
-}
 </script>
 
 <style>
