@@ -1,79 +1,79 @@
 # Alist Course Plugin
 
-一个基于 Alist 的在线课程视频播放器插件，支持课程目录浏览、视频播放和进度记录等功能。
+[中文](README_zh.md)
 
-受够了使用emby看课程，所以自己写一个。
+An online course video player plugin based on Alist, supporting course directory browsing, video playback, and progress tracking.
 
-## 功能特点
+Got tired of using Emby for courses, so I made this.
 
-- 🎯 课程目录树形展示
-- 🎬 在线视频播放
-- 📝 自动记录播放进度
-- 🔄 断点续播支持
-- 📱 响应式布局设计
-- 🔒 支持 Alist 认证
+## Features
 
-## 技术栈
+- 🎯 Tree-style course directory display
+- 🎬 Online video playback
+- 📝 Automatic progress tracking
+- 🔄 Resume playback support
+- 📱 Responsive layout design
+- 🔒 Alist authentication support
+
+## Tech Stack
 
 - Vue 3
 - TypeScript
 - Alist API
 - artplayer
 
-## 快速开始
+## Quick Start
 
-### 安装依赖
+### Install Dependencies
 
 ```bash
 npm install
 ```
 
-### 开发环境运行
+### Run Development Environment
 
 ```bash
 npm run dev
 ```
 
-### 构建生产版本
+### Build Production Version
 
 ```bash
 npm run build
 ```
 
-## 配置说明
+## Configuration Guide
 
-首次使用需要配置以下信息：
+First-time users need to configure the following:
 
-1. Alist 服务器地址
-2. Alist 访问令牌
-3. 课程根目录路径
+1. Alist server address
+2. Alist access token
+3. Course root directory path
 
-可以通过界面右上角的配置按钮进行设置。
+These can be set through the configuration button in the top right corner.
 
-## 目录结构要求
+## Directory Structure Requirements
 
-课程文件需要按照以下结构在 Alist 中组织：
+Course files should be organized in Alist as follows:
 
 ```
-课程根目录/
-  ├── 课程1/
-  │   ├── 章节1/
-  │   │   ├── 视频1.mp4
-  │   │   └── 视频2.mp4
-  │   └── 章节2/
-  └── 课程2/
+Course Root/
+  ├── Course1/
+  │   ├── Chapter1/
+  │   │   ├── Video1.mp4
+  │   │   └── Video2.mp4
+  │   └── Chapter2/
+  └── Course2/
 ```
 
-## 运行效果
+## Preview
 
-[在线预览](https://www.ztianzeng.com/alist-course-plugin/)
+[Live Demo](https://www.ztianzeng.com/alist-course-plugin/)
 
-![截图](docs/config.png)
+![Screenshot](docs/config.png)
 
-![截图](docs/list.png)
+![Screenshot](docs/list.png)
 
-![截图](docs/courser.png)
+![Screenshot](docs/courser.png)
 
-![截图](docs/fuck.png)
-
-
+![Screenshot](docs/fuck.png)
