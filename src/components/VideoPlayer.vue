@@ -89,7 +89,7 @@ const createPlayer = () => {
       if (player && progressManager) {
         const savedProgress = progressManager.getVideoProgress();
         if (savedProgress) {
-          player.seek = savedProgress.currentTime;
+          player.seek = savedProgress?.currentTime || 0;
         }
       }
     });

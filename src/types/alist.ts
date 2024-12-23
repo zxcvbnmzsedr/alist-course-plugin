@@ -10,7 +10,7 @@ export interface AlistFile {
   thumb?: string
   type: number
   download_url: string
-  quantity?: quality,
+  quantity?: Array<quality>
   children?: AlistFile[]
 }
 
