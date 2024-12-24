@@ -27,6 +27,7 @@
         <course-directory
           :course-path="coursePath"
           :course-name="courseName"
+          :selected-file="selectedFile"
           @file-selected="selectedFile = $event"
           @update-video-files="updateVideoFiles"
         />

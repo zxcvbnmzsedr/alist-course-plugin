@@ -11,6 +11,7 @@
       @node-click="handleNodeClick"
       :load="loadNode"
       lazy
+      node-key="path"
       highlight-current
     >
       <template #default="{ node, data }">
@@ -42,7 +43,7 @@
 </template>
 
 <script setup lang="ts">
-import {ref, onMounted} from 'vue'
+import {ref, onMounted, watch} from 'vue'
 import {useRouter} from 'vue-router'
 import {ElMessage} from 'element-plus'
 import {Folder, Document, VideoPlay} from '@element-plus/icons-vue'
@@ -51,10 +52,12 @@ import type {AlistFile} from '@/types/alist'
 import {getFileList} from '@/api/alist'
 import {useProgressStore} from '@/stores/progressStore'
 import {isVideo} from '@/utils/filetype'
+import type { TreeInstance } from 'element-plus'
 
 interface Props {
   coursePath: string
   courseName: string
+  selectedFile?: AlistFile | null
 }
 
 const props = defineProps<Props>()
@@ -64,7 +67,7 @@ const emit = defineEmits<{
 }>()
 
 const router = useRouter()
-const treeRef = ref()
+const treeRef = ref<TreeInstance>()
 const treeData = ref<AlistFile[]>([])
 const loading = ref(true)
 const defaultProps = {
@@ -156,7 +159,7 @@ const handleNodeClick = async (data: AlistFile) => {
   }
 }
 
-// ���取视频进度百分比
+// 获取视频进度百分比
 const progressStore = useProgressStore()
 const getVideoPercentage = (path: string): number => {
   const progress = progressStore.getVideoProgress(path)
@@ -199,7 +202,7 @@ const initRootNode = async () => {
     emit('updateVideoFiles', files)
   } catch (error: unknown) {
     if ((error as ApiError).response?.status === 401) {
-      ElMessage.error('认证失败��请重新登录')
+      ElMessage.error('认证失败，请重新登录')
       router.push('/config')
     } else {
       ElMessage.error('获取文件列表失败')
@@ -214,6 +217,20 @@ const initProgressStore = async () => {
   const rootPath = `/${props.coursePath}/${props.courseName}`
   progressStore.changeCourse(rootPath)
 }
+
+const setCurrentNode = (file: AlistFile) => {
+  if (!treeRef.value) return
+
+  // Find the node that matches the file path
+  treeRef.value.setCurrentKey(file.path)
+}
+
+// Add this watch to handle external file changes
+watch(() => props.selectedFile, (newFile) => {
+  if (newFile) {
+    setCurrentNode(newFile)
+  }
+}, { immediate: true })
 
 onMounted(async () => {
   await initProgressStore()
