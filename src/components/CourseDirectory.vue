@@ -26,8 +26,9 @@
             <Document/>
           </el-icon>
           <span :class="{ 'text-primary': isVideo(data) }">{{ node.label }}</span>
-          <div v-if="(isVideo(data) || data.is_dir) && getNodeProgress(data)" class="ml-2">
+          <div v-if="isVideo(data) || data.is_dir" class="ml-2 flex items-center">
             <el-progress
+              v-if="getNodeProgress(data)"
               type="circle"
               :percentage="getNodeProgress(data)"
               :width="16"
@@ -35,6 +36,16 @@
               :show-text="false"
               :status="isNodeCompleted(data) ? 'success' : ''"
             />
+            <el-button
+              v-if="!isNodeCompleted(data) && !data.is_dir"
+              size="small"
+              type="primary"
+              class="mark-complete-btn opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+              link
+              @click.stop="markAsCompleted(data)"
+            >
+              已看完
+            </el-button>
           </div>
         </div>
       </template>
@@ -164,6 +175,7 @@ const progressStore = useProgressStore()
 const getVideoPercentage = (path: string): number => {
   const progress = progressStore.getVideoProgress(path)
   if (!progress) return 0
+  if (progress.completed) return 100
   return Math.round(((progress.currentTime || 0) / (progress.duration || 0)) * 100)
 }
 
@@ -232,6 +244,23 @@ watch(() => props.selectedFile, (newFile) => {
   }
 }, { immediate: true })
 
+// 添加标记完成的方法
+const markAsCompleted = (data: AlistFile) => {
+  let progress = progressStore.getVideoProgress(data.path)
+  if (!progress) {
+    progress = {
+      path: data.path,
+      currentTime: 0,
+      duration: 0,
+      completed: true
+    }
+  } else {
+    progress.completed = true
+  }
+  progressStore.updateVideoProgress(data.path, progress)
+  progressStore.saveProgress()
+}
+
 onMounted(async () => {
   await initProgressStore()
   await initRootNode()
@@ -243,6 +272,12 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   font-size: 14px;
+  width: 100%;
+  padding: 2px;
+}
+
+.custom-tree-node:hover {
+  background-color: var(--el-fill-color-light);
 }
 
 .text-primary {
@@ -251,5 +286,14 @@ onMounted(async () => {
 
 :deep(.el-progress-circle) {
   vertical-align: middle;
+}
+
+.mark-complete-btn {
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.custom-tree-node:hover .mark-complete-btn {
+  opacity: 100;
 }
 </style>
