@@ -1,17 +1,18 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { putFile, getFileInfo } from '@/api/alist'
+import { putText, getFileInfo } from '@/api/alist'
 import type { CourseProgress, VideoProgress } from '@/types/progress'
 const PROGRESS_FILE = '.course_progress.json'
 import {isVideo} from '@/utils/filetype'
 import type { AlistFile } from '@/types/alist'
 export const useProgressStore = defineStore('progress', () => {
-  const state = ref<CourseProgress>({
+  const state = ref<CourseProgress & { isInit: boolean }>({
     version: '1.0.0',
     coursePath: '',
     courseRootPath: '',
     videos: {},
-    dirProgress: {}
+    dirProgress: {},
+    isInit: false
   })
   const changeCourse = (courseRootPath: string) => {
     state.value.courseRootPath = courseRootPath
@@ -27,6 +28,7 @@ export const useProgressStore = defineStore('progress', () => {
           ...content,
         }
       }
+      state.value.isInit = true
     } catch (error) {
       console.log('Progress file not found, using default state', error)
     }
@@ -49,12 +51,11 @@ export const useProgressStore = defineStore('progress', () => {
 
   const saveProgress = async () => {
     try {
-
+      if (!state.value.isInit) {
+        return
+      }
       const content = JSON.stringify(state.value, null, 2)
-      const blob = new Blob([content], { type: 'application/json' })
-      const formData = new FormData()
-      formData.append('file', blob, PROGRESS_FILE)
-      await putFile(`${state.value.courseRootPath}/${PROGRESS_FILE}`, formData)
+      await putText(`${state.value.courseRootPath}/${PROGRESS_FILE}`, content)
     } catch (error) {
       console.error('Failed to save progress:', error)
     }

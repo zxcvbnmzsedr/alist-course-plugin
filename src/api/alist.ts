@@ -93,11 +93,21 @@ export const login = async (username: string, password: string) => {
   })
   return response.data
 }
+// 好危险，一直会创建重复文件不知道是啥原因
+// export const putFile = async (path: string, file: any) => {
+//   const response = await alistApi.put(`/api/fs/form`, file, {
+//     headers: {
+//       'File-Path': encodeURIComponent(path)
+//     }
+//   })
+//   return response.data
+// }
 
-export const putFile = async (path: string, file: any) => {
-  const response = await alistApi.put(`/api/fs/form`, file, {
+export const putText = async (path: string, content: string) => {
+  const response = await alistApi.put(`/api/fs/put`, content, {
     headers: {
-      'File-Path': encodeURIComponent(path)
+      'File-Path': encodeURIComponent(path),
+      'As-Task': 'false'
     }
   })
   return response.data

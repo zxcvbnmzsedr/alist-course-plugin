@@ -23,6 +23,9 @@ dependencies:
   hls.js:
     specifier: ^1.5.18
     version: 1.5.18
+  monaco-editor-vue3:
+    specifier: ^0.1.10
+    version: 0.1.10(typescript@5.6.3)
   natural-orderby:
     specifier: ^5.0.0
     version: 5.0.0
@@ -3014,6 +3017,20 @@ packages:
       ufo: 1.5.4
     dev: true
 
+  /monaco-editor-vue3@0.1.10(typescript@5.6.3):
+    resolution: {integrity: sha512-C1jhyx+KHQyW1AbjuA8DhIZSqkVquV7MnuWXG9jESd0e+CkzEFzuk1RvNqlN2eJ2fRkvF32yEPHYfvz9quOhHQ==}
+    dependencies:
+      monaco-editor: 0.33.0
+      vite-plugin-monaco-editor: 1.1.0(monaco-editor@0.33.0)
+      vue: 3.5.13(typescript@5.6.3)
+    transitivePeerDependencies:
+      - typescript
+    dev: false
+
+  /monaco-editor@0.33.0:
+    resolution: {integrity: sha512-VcRWPSLIUEgQJQIE0pVT8FcGBIgFoxz7jtqctE+IiCxWugD0DwgyQBcZBhdSrdMC84eumoqMZsGl2GTreOzwqw==}
+    dev: false
+
   /mpd-parser@1.3.1:
     resolution: {integrity: sha512-1FuyEWI5k2HcmhS1HkKnUAQV7yFPfXPht2DnRRGtoiiAAW+ESTbtEXIDpRkwdU+XyrQuwrIym7UkoPKsZ0SyFw==}
     hasBin: true
@@ -3706,6 +3723,14 @@ packages:
       - rollup
       - supports-color
     dev: true
+
+  /vite-plugin-monaco-editor@1.1.0(monaco-editor@0.33.0):
+    resolution: {integrity: sha512-IvtUqZotrRoVqwT0PBBDIZPNraya3BxN/bfcNfnxZ5rkJiGcNtO5eAOWWSgT7zullIAEqQwxMU83yL9J5k7gww==}
+    peerDependencies:
+      monaco-editor: '>=0.33.0'
+    dependencies:
+      monaco-editor: 0.33.0
+    dev: false
 
   /vite-plugin-vue-devtools@7.6.8(vite@6.0.3)(vue@3.5.13):
     resolution: {integrity: sha512-32aIps8C1Y7UEoqyWf+ES3J1OozsCYMIqTqd+I5qass+R0Tcf8SaA2bX1/rskAzkcKCteVoBjEENmqwTcMebbw==}

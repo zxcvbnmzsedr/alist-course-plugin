@@ -43,8 +43,15 @@
             ref="videoPlayer"
           />
         </div>
+        <div v-else-if="selectedFile && isText(selectedFile)" class="w-full h-full">
+          <text-editor
+            v-model:course-file="selectedFile"
+            @update:courseFile="updateCourseFile"
+            class="h-full"
+          />
+        </div>
         <div v-else class="flex-center h-full">
-          <el-empty description="请选择视频文件进行播放"/>
+          <el-empty description="请选择文件进行查看"/>
         </div>
       </div>
     </div>
@@ -55,10 +62,11 @@
 import {ref, computed} from 'vue'
 import {useRouter, useRoute} from 'vue-router'
 import VideoPlayer from '@/components/VideoPlayer.vue'
+import TextEditor from '@/components/TextEditor.vue'
 import CourseDirectory from '@/components/CourseDirectory.vue'
 import {Setting, Menu} from '@element-plus/icons-vue'
 import type {AlistFile} from '@/types/alist'
-import {isVideo} from '@/utils/filetype'
+import {isVideo, isText} from '@/utils/filetype'
 
 const router = useRouter()
 const route = useRoute()
